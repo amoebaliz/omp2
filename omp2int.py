@@ -34,10 +34,10 @@
 #   or  matthias.tomczak@flinders.edu.au
 # --------------------------------------------
 import numpy as np
-from omp2 import omp2 #set up omp2.m as a py script
+from omp2 import omp2 
+from qwt2 import qwt2
 
-#clear all
-#close all
+
 print '  '
 print 'OMP Analysis version 2 (March 1999)'
 print '===================================  '
@@ -99,8 +99,8 @@ if not 'lat' in locals():
 if not 'press' in locals(): 
    print 'WARNING: This dataset does not contain a variable recognised as pressure!'
 
-eex[:11] = [0,0,0,0,0,0,0,0,0,0,0];   # index of available variables
-esx[:11] = [0,0,0,0,0,0,0,0,0,0,0];   # index of selected variables
+eex[:11] = [0,0,0,0,0,0,0,0,0,0,0]    # index of available variables
+esx[:11] = [0,0,0,0,0,0,0,0,0,0,0]    # index of selected variables
                                       # 1: latitude
 	     		              # 2: longitude
 				      # 3: pressure
