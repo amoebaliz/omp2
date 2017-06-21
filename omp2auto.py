@@ -33,9 +33,12 @@
 # BUGS: jkarstensen@geomar.de
 #   or  matthias.tomczak@flinders.edu.au
 # --------------------------------------------
+import scipy.io
 import numpy as np
-import scipy.io as sio
+import matplotlib.pyplot as plt
 from omp2 import omp2 #set up omp2.m as a py script
+from qwt2 import qwt2
+from sw_dist import sw_dist
 
 print '  '
 print 'OMP Analysis version 2 (March 1999)'
@@ -44,16 +47,42 @@ print '  '
 
 
 # Loading the run parameters from the control file (call to incontr2)
-matfil='/Users/elizabethdrenkard/TOOLS/omp2mats/testdata.mat'
-io.loadmat(matfil)
 
-#eval('newfile')
-#eval('load dataset')
+### FROM incontr2: #### 
+OMP = 'cla'
+dataset = '/Users/elizabethdrenkard/TOOLS/omp2mats/testdata.mat'
+selection='(press>300) & (press<500)'
+#'(pdens>26.3) & (pdens <27) & (oxy>=20) & (press>300) & (press<500)'
+switchpot = 'n'
+iox = 'y' # oxygen switch
+iph = 'y' # phosphate switch
+ini = 'y' # nitrate switch
+isi = 'n' # silicate switch
+weightset='/Users/elizabethdrenkard/TOOLS/omp2mats/testwght.mat'
+swtypes = 'qwt2'
+wm = 2
+qwt_pos = [0,1,2,3] # changed from [1,2,3,4]
+#####################
+
+mat_dat=scipy.io.loadmat(dataset)
+globals().update(mat_dat)
+
+weight_dat=scipy.io.loadmat(weightset)
+globals().update(weight_dat)
+
+fig, ax = plt.subplots()
+dist,phaseangle = sw_dist(lat,long,'km')
+cumdist=np.append(0, np.cumsum(dist))
+ax.plot(cumdist,pdens.squeeze(),'ko')
+ax.invert_yaxis()
+#plt.show()
+#####################
+
 #eex[:11] = [1,1,1,1,1,0,0,0,0,0,1]   # index of available variables
 #esx[:11] = [1,1,1,1,1,0,0,0,0,0,1]   # index of selected variables
 
-eex = np.array(1,1,1,1,1,0,0,0,0,0,1)   # index of available variables
-esx = np.array(1,1,1,1,1,0,0,0,0,0,1)   # index of selected variables
+eex = np.array((1,1,1,1,1,0,0,0,0,0,1))   # index of available variables
+esx = np.array((1,1,1,1,1,0,0,0,0,0,1))   # index of selected variables
                                      # 1: latitude
 				     # 2: longitude
 				     # 3: pressure
@@ -70,24 +99,43 @@ esx = np.array(1,1,1,1,1,0,0,0,0,0,1)   # index of selected variables
 # swapped in the program so that mass conservation is always the last column, after potential vorticity.
 # The arrangement of the water type matrix and the weight vector thus differs from the description
 # in the user manual. This should not be of concern but has to be watched when changing the code.
-		
-if not 'temp' in locals():
-	temp = sw_temp(sal,ptemp,press,0);
 
-if 'sal' in locals():
+
+if mat_dat.has_key('lat'):
+   eex[0] = 1
+
+if mat_dat.has_key('long'):
+   eex[1] = 1
+
+if mat_dat.has_key('press'):
+   eex[2] = 1	
+
+if mat_dat.has_key('sal'):
    eex[3] = 1
-if 'ptemp' in locals():
+
+if mat_dat.has_key('ptemp'):
    eex[4] = 1
-if 'oxy' in locals():
+
+if mat_dat.has_key('oxy'):
    eex[5] = 1
-if 'ph' in locals():
+
+if mat_dat.has_key('ph'):
    eex[6] = 1
-if 'ni' in locals():
+
+if mat_dat.has_key('ni'):
    eex[7] = 1
-if 'si' in locals():
+
+if mat_dat.has_key('si'):
    eex[8] = 1
-if 'pvort' in locals():
+
+if mat_dat.has_key('pvort'):
    eex[9] = 1
+
+if mat_dat.has_key('temp'):
+   temp = mat_dat['temp']
+else:
+   temp = sw_temp(sal,ptemp,press,0)
+
 
 
 #Check and if necessary calculate potential vorticity
@@ -141,13 +189,15 @@ if switchpot == 'y':
    esx[9] = 1
 
 # Read the weight and Redfield ratio file
-eval('load weightset');
+    
 
 # Check which weights are needed and reset the diagonal:
 A    = np.diag(Wx)
+A.setflags(write=1)
 A1   = A[7]  # change order of weights so that mass conservation is last
 A[7] = A[6]
 A[6] = A1
+ratio = ratio.squeeze()
 
 if esx[4] == 0:
    A[0] = 0
@@ -180,48 +230,47 @@ del A
 # End of if statements for weights and Redfield ratio
 
 # Read the water types
-del G1
-G0,wmnames,i = eval('swtypes[qwt_pos,0]')
+G0,wmnames,i = qwt2(qwt_pos,0)
+
 wm_index = []
 wm_ind0  = []
 wm_ind1  = []
 j = 0
 print '  '
 tit_index = []
+print wmnames
 for i in range(len(qwt_pos)):
-    wm_ind1 = wmnames[5*(qwt_pos[i]-1):5*(qwt_pos[i]-1)+5]
-    print wmnames[5*(qwt_pos[i]-1):5*(qwt_pos[i]-1)+5]
+    wm_ind1 = wmnames[qwt_pos[i]]
     k = (wm_ind0==wm_ind1)
     if not k:
        j = j+1
-       tit_index = [tit_index, wmnames[5*(qwt_pos[i]-1):5*(qwt_pos[i]-1)+5]]
+       tit_index.extend([wmnames[qwt_pos[i]]])
     wm_ind0 = wm_ind1
-    wm_index = [wm_index, j]
+    wm_index.extend([j])
 
 nr_of_wm = wm_index[len(wm_index)-1]
 
 i = 2
-del G1
-G1[0,:] = G0[0,:]
-G1[1,:] = G0[1,:]
+#del G1
+# G1 add rows
+G1 = G0[:2,:]
+
 if esx[5] == 1:
-   G1[2,:] = G0[2,:]
+   G1 = np.concatenate((G1,np.array([G0[2,:]])),axis=0)
    i = i+1
 if esx[6] == 1:
-   G1[i,:] = G0[3,:]
+   G1 = np.concatenate((G1,np.array([G0[3,:]])),axis=0)   
    i = i+1
 if esx[7] ==1:
-   G1[i,:] = G0[4,:]
+   G1 = np.concatenate((G1,np.array([G0[4,:]])),axis=0)
    i = i+1
 if esx[8] == 1:
-   G1[i,:] = G0[5,:]
+   G1 = np.concatenate((G1,np.array([G0[5,:]])),axis=0)
    i = i+1
 if esx[9] == 1:
-   G1[i,:] = G0[7,:]
+   G1 = np.concatenate((G1,np.array([G0[7,:]])),axis=0)   
    i = i+1
-G1[i,:] = G0[6,:]
-print G1
-
+G1 = np.concatenate((G1,np.array([G0[6,:]])),axis=0)
 # This is the main part of it all: The call to omp2.m which does the analysis
-omp2
+omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,esx,press,sal,oxy,ptemp,temp,pdens,ph,ni,G1,wm_index)
 # It's all done. Documentation and display is all in omp2.m.

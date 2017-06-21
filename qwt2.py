@@ -21,11 +21,11 @@ def qwt2(wm_row,ict):
     #   or  matthias.tomczak@flinders.edu.au
     # --------------------------------------------
 
-    if nargin<1:
-       print ' '
-       print '     Please give the rwo index of SWT definitions you want to use:'
-       print ' e.g. qwt_step([1 2 3 6]) activates row 1, 2, 3, and 6 '
-       print '  '
+    #if nargin<1:
+    #   print ' '
+    #   print '     Please give the rwo index of SWT definitions you want to use:'
+    #   print ' e.g. qwt_step([1 2 3 6]) activates row 1, 2, 3, and 6 '
+    #   print '  '
 
     # The following lines identify the water masses defined through each water type.
     # There is one water mass name for each water type definition row.
@@ -53,21 +53,23 @@ def qwt2(wm_row,ict):
     #            uninterrupted sequence. (For example, calling qwt2([1 2 7]) will add
     #            the AAMW contributions, calling qwt2([1 7 2]) will not.)
     #
-
-    wm[:5]    = ' AAMW' #                       first row
-    wm[5:10]  = ' AAMW' #                       second row
-    wm[10:15] = '  ICW' # upper, first set      third row
-    wm[15:20] = '  ICW' # lower, first set      forth row
-    wm[20:25] = '  ICW' # upper, second set     fifth row
-    wm[25:30] = '  ICW' # lower, second set     sixth row
-    wm[30:35] = ' AAIW' #                       seventh row
-    wm[35:40] = '  IEW' #                       eigth row
+    import numpy as np
+    wm = ('AAMW', 'AAMW',  'ICW', 'ICW',\
+          'ICW' , 'ICW' , 'AAIW', 'IEW')
+    #wm[:5]    = ' AAMW' #                       first row
+    #wm[5:10]  = ' AAMW' #                       second row
+    #wm[10:15] = '  ICW' # upper, first set      third row
+    #wm[15:20] = '  ICW' # lower, first set      forth row
+    #wm[20:25] = '  ICW' # upper, second set     fifth row
+    #wm[25:30] = '  ICW' # lower, second set     sixth row
+    #wm[30:35] = ' AAIW' #                       seventh row
+    #wm[35:40] = '  IEW' #                       eigth row
 
     #  The following lines define the water types. The order of parameters is
     #  ptemp    sal      oxy    PO4     NO3    Si    mass   pvort
     #  Note: potential vorticity is multiplied by 10*8.
 
-    all=np.array(( \
+    wts=np.array(( \
 
     (   10,  34.56,   91,   2.1,   30,   40,  1.0,  0.03),   #1 lower AAMW
     ( 16.4,  34.55,  100,   1.4,   19,   25,  1.0,  1.12),   #2 upper AAMW  
@@ -77,9 +79,8 @@ def qwt2(wm_row,ict):
     (14.35,   35.4,  224,   0.6,  6.5,  0.5,  1.0,  0.05),   #6 upper ICW, second set
     (  4.5,  34.35,  210,   2.2,   32,   35,  1.0,  0.30),   #7 AAIW
     (  8.5,     35,   60,   2.5,   35,   60,  1.0,  0.04)))  #8 IEW
-
-
-    G1=np.transpose(all[wm_row,:])
-    allsize = all.shape
+    print 'WM_ROW', wm_row
+    G1=np.transpose(wts[wm_row,:])
+    allsize = wts.shape
 
     return G1, wm, allsize

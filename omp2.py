@@ -27,12 +27,15 @@
 #   or  matthias.tomczak@flinders.edu.au
 
 # 
-def omp2():
-
+def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,esx,press,sal,oxy,ptemp,temp,pdens,ph,ni,G1,wm_index):
+    from norm_qwt import norm_qwt
+    import scipy
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from contour2 import contour2
     print '  '
     print 'OMP analysis now running. ', str(len(lat)) + ' data points found.'
     print '  '
-
     #starttime = clock;
     gap=0
 
@@ -43,41 +46,46 @@ def omp2():
     print 'Screening the data and reducing them to the selected range.'
     print '  '
 
-    switch(switchpot)
     if switchpot == 'y':
 	 eval('index=np.where((imag[pvort]==0) & (pvort<100) & (selection ))')
 	 pvort = abs(pvort)
     else:
-	 eval('index=np.where(selection)[0]')
+         exec('index = np.where(' + selection + ')[0]')
 
-    lat   =  np.transpose(lat[index])
-    press =  np.transpose(press[index])
-    long  =  np.transpose(long[index])
-    sal   =  np.transpose(sal[index])
+    print len(index)
+    lat   = lat[index]
+    press = press[index]
+    long  = long[index]
+    sal   = sal[index]
+
+    #lat   =  np.transpose(lat[index])
+    #press =  np.transpose(press[index])
+    #long  =  np.transpose(long[index])
+    #sal   =  np.transpose(sal[index])
       
     if 'temp' in locals():
-       temp = np.transpose(temp[index])
-    if ~isempty(switchpot) & switchpot == 'y':
-       pvort = np.transpose(pvort(index))
+       temp = temp[index]
+    if switchpot == 'y':
+       pvort = pvort[index]
     if 'ptemp' in locals():
-       ptemp = np.transpose(ptemp[index])
+       ptemp = ptemp[index]
     else:
        ptemp = sw_ptmp(sal,temp,press,0)
     if 'pdens' in locals():
-       pdens = np.transpose(pdens[index])
+       pdens = pdens[index]
     else:
        pdens = sw_dens0(sal,temp) - 1000
     if esx[6] == 1: 
-       oxy =  np.transpose(oxy[index])
+       oxy =  oxy[index]
     if esx[7] == 1: 
-       ph  =  np.transpose(ph[index])
+       ph  =  ph[index]
     if esx[8] == 1: 
-       ni  =  np.transpose(ni[index])
+       ni  =  ni[index]
     if esx[9] == 1: 
-       si  =  np.transpose(si[index])
+       si  =  si[index]
     del index
 
-    print 'OMP analysis now running. ', num2str(length(lat)), ' data points to be analysed.'
+    print 'OMP analysis now running. ', str(len(lat)), ' data points to be analysed.'
     print '  '
 
     m,n = G1.shape[:] # n = number of water types, m = number of equations
@@ -86,7 +94,7 @@ def omp2():
     G, mG, stdG = norm_qwt(G1)
 
     # EXTENDED OMP switch:
-    switch(OMP)
+    # switch(OMP)
     if OMP == 'ext':
          # Adding Redfield ratio to the system, ratio comes from weight file
          G1[:m,n]=np.transpose(redfrat[:m])
@@ -98,105 +106,82 @@ def omp2():
 	 G[m,n] = 0
 
     # adding weights
-    G2=Wx*G
+    G2=np.dot(Wx,G)
 
     gap=0
     # PYTH
     # ***********************************************************
     # This is the main loop for each data point; k = point index
     # First some initial settings
-    err=zeros((m,length(lat)))-nan; 
-
+    err=np.zeros((m,len(lat)))-np.nan; 
     if OMP == 'ext':
        biogeo=np.zeros[1,len(lat)]-nan 
-
-    A[:wm_index[len(wm_index)-1],:len(lat)] = \
-                 np.zeros((wm_index[len(wm_index)-1],length(lat)));
-
-    oxy_dat = []
-    ph_dat  = []
-    ni_dat  = []
-    si_dat  = []
-    pv_dat  = []
+    A = np.zeros((wm_index[len(wm_index)-1],len(lat)))
 
     # Vector of each datapoint (btst) is build here
-    for k in len(lat):
+    for k in range(len(lat)):
 	# selecting the correct parameters
-        p_dat	= press[k]
-        t_dat	= ptemp[k] 
-        s_dat	=   sal[k] 
-    if esx[5] == 1: 
-       oxy_dat	= oxy[k]
-    if esx[6] == 1:  
-       ph_dat	= ph[k]
-    if esx[7] == 1:  
-       ni_dat	= ni[k]
-    if esx[8] == 1:  
-       si_dat  = si[k]
-    if 'pdens'in locals():
-       pden_dat = pdens[k]
-    if esx[9] == 1:
-       pv_dat = pvort[k]
-    kon=1
-	
-    btst= [t_dat,s_dat,oxy_dat,ph_dat,ni_dat,si_dat,pv_dat,kon]
+        btst = np.append(ptemp[k],sal[k])
+        if esx[5] == 1: 
+           btst = np.append(btst,oxy[k])
+        if esx[6] == 1:  
+           btst = np.append(btst,ph[k])
+        if esx[7] == 1:  
+           btst = np.append(btst,ni[k])
+           if esx[8] == 1:
+              btst = np.append(btst,si[k])  
+        if 'pdens'in locals():
+           pden_dat = pdens[k]
+           if esx[9] == 1:
+              btst = np.append(btst,pvort[k])
+        btst = np.append(btst,1)
 
-    if etime(clock,starttime) > 5:
-       print num2str[k], ' data points analysed so far.'
-       starttime = clock
-    # looking for GAP (indicated through NaN):
-    index1=find(~isnan(btst))
-    index0=find(isnan(btst))
+        index1=np.where(~np.isnan(btst))[0]
+        index0=np.where(np.isnan(btst))[0]
+        cutit=n
+        # (because we have one unknown more!)
+        if OMP[:3]=='ext':
+           cutit=n+1
 
-    cutit=n;
-    # using extended OMP we need one parameter more 
-    # (because we have one unknown more!)
-    if OMP[:3]=='ext':
-       cutit=n+1
+        if len(index1) < cutit+1: # if 
+           # not enough parameters to find a NNLS fit
+           # DATA point not successful analysed
+           print 'ANALYSIS of the datapoint failed, not enough parameters available !!'
+           A[:nr_of_wm,k] = nan
+           Dual[:nr_of_wm,k] = nan
+           gap+=1
 
-    if length(index1) < cutit+1 %if1 :
-       # not enough parameters to find a NNLS fit
-       # DATA point not successful analysed
-       print 'ANALYSIS of the datapoint failed, not enough parameters available !!'
-       A[:nr_of_wm,k] = nan
-       Dual[:nr_of_wm,k] = nan
-       gap+=1
+        else:
+           #new data without GAP:
+           b1    = btst[index1]
+           mG1   =   mG[index1]
+           stdG1 = stdG[index1]
+ 
+        # standardize the data:
+        b = np.zeros(len(b1))
+        for i in range(len(b1)-1):
+            b[i]=(b1[i]-mG1[i])/stdG1[i]
+        b[len(b1)-1]=b1[len(b1)-1]
 
-    else:
-       #new data without GAP:
-       b1    = btst[index1]
-       mG1   =   mG[index1]
-       stdG1 = stdG[index1]
+        # add weights:  
+        b2=Wx[index1,index1]*b
 
-    # standardize the data:
-    for i in range(length(b1)-1):
-        b[i,0]=(b1[i]-mG1[i])/stdG1[i]
-    b[len(b1)-1]=b1[len(b1)-1]
+        ## use either nnls.m or lsqnonneg.m depending on MatLab version
+        x, rnorm = scipy.optimize.nnls(G2[index1,:],b2)
+        # calculate residuals for individual parameters
+        err[index1,k] = np.dot(G1[index1,:],x) - np.transpose(btst[index1]) 
+        #add contributions from identically named water masses
+        for i in range(n):
+	    A[wm_index[i]-1,k]    = A[wm_index[i]-1,k] + x[i]
 
-    # add weights:  
-    b2=Wx[index1,index1]*b
-
-    ## use either nnls.m or lsqnonneg.m depending on MatLab version
-    if str2num(vers)<6:
-       x,dual = nnls[G2[index1,:],b2]
-    else:
-       x,resnorm = lsqnonneg[G2[index1,:],b2]    
-
-    # calculate residuals for individual parameters
-    err[index1,k] = np.transpose(G1[index1,:]*x-btst[index1]) 
-
-    #add contributions from identically named water masses
-    for i in range(n):
-	A[wm_index[i],k]    = A[wm_index[i],k] + x[i]
-
-    # in case of extended OMP analysis the biogeochemical part is 
-    # stored:
-    # NOTE: this has to be referenced with the appropriate ratio to
-    # convert into "mixage"
-    # default is changes in oxygen UNIT= ?mol/kg!!! and NOT years!!!
-    if OMP == 'ext':
-       biogeo[k]=x[len(x)-1]*(-ratio[3])
-    del b
+        # in case of extended OMP analysis the biogeochemical part is 
+        # stored:
+        # NOTE: this has to be referenced with the appropriate ratio to
+        # convert into "mixage"
+        # default is changes in oxygen UNIT= ?mol/kg!!! and NOT years!!!
+        if OMP == 'ext':
+           biogeo[k]=x[len(x)-1]*(-ratio[3])
+        del b
         #end of loop with enough data
 
        ## end of data point loop
@@ -231,14 +216,14 @@ def omp2():
     print 'Water types used:'
     print '  '
     for i in range(len(qwt_pos)):
-	print wmnames[5*(qwt_pos[i]-1):5*(qwt_pos[i]-1)+5]
+	print wmnames[i]
     print '  '
     print 'Water type definitions for the selected variables and mass conservation'
     if OMP == 'ext': print 'Last column gives Redfield ratios'
     print '  '
     print G1
 
-    print 'successfully analysed datapoints:', num2str(100-100*gap/k), ' %' 
+    print 'successfully analysed datapoints:', str(100-100*gap/(k+1)), ' %' 
 
     print '  '
     print 'Print this summary for reference and check that the results make sense.'
@@ -247,64 +232,68 @@ def omp2():
 
 
     # plotting residuals
-    plt.figure()
-    plt.plot(100*err[m,:],pdens,'.','markers',10),axis('ij')
-    xlabel('mass conservation residual of fit (%)')
-
+    fig, ax = plt.subplots()
+    ax.plot(100*err[m-1,:],pdens,'o')
+    #ax.set_ylim([22,28])
+    #ax.set_xlim([-50,150])
+    ax.invert_yaxis()
+    ax.set_xlabel('mass conservation residual of fit (%)')
+    ax.set_ylabel('density')
     print '  '
     j = 'n'
-    incontrol = input('Do you want to see more graphic output (y/n)?  [n]  ','s')
-    if length(incontrol) > 0: j = incontrol
+    incontrol = input('Do you want to see more graphic output (y/n)?  [n]  ')
+    if len(incontrol) > 0: 
+       j = incontrol
 
     if j == 'y':
        # plotting water mass fractions
        for i in range (nr_of_wm):
 	   ctpara = i
-	   tit_str = tit_index[5*(i-1):5*(i-1)+5]
-	   np.figure()
-	   contour2
+	   tit_str = tit_index[i]
+	   contour2(ctpara, tit_str, A, lat, long,press)
     # add a biogeochemistry plot if extended OMP 
     if OMP == 'ext':
        plt.figure()
        contour_bio
-
+    print tit_index
     print '  '
 
     # storing data in directory/folder OUTPUT
     j = 'y'
-    incontrol = input('Do you want to store your results (y/n)?  [y]  ','s')
-    if length(incontrol) > 0:
-       j = incontrol
+    #incontrol = input('Do you want to store your results (y/n)?  [y]  ')
+    #if len(incontrol) > 0:
+    #   j = incontrol
 
-    if j == 'y':
-       drswitch('Output is stored in')
-       print '  '
-       vname = 'result'
-       incontrol = input('Give a file name for output storage: [result]  ','s')
-       if length(incontrol) > 0:
-           vname = incontrol
-       incontrol = vname
-       lv = length(vname)+1
+    #if j == 'y':
+    #   drswitch('Output is stored in')
+    #   print '  '
+    #   vname = 'result'
+    #   incontrol = input('Give a file name for output storage: [result]  ','s')
+    #   if len(incontrol) > 0:
+    #       vname = incontrol
+    #   incontrol = vname
+    #   lv = len(vname)+1
 
-    if OMP == 'ext':
-       print 'extended results written'
-       vname = vname + '  nr_of_wm tit_index A err esx lat long press pdens biogeo'
-    else: 
-       vname = vname + '  nr_of_wm tit_index A err esx lat long press pdens'
+    #if OMP == 'ext':
+    #   print 'extended results written'
+    #   vname = vname + '  nr_of_wm tit_index A err esx lat long press pdens biogeo'
+    #else: 
+    #   vname = vname + '  nr_of_wm tit_index A err esx lat long press pdens'
 		
-    if esx[3]  == 1: vname = vname + ' sal'
-    if esx[4]  == 1: vname = vname + ' ptemp'
-    if esx[5]  == 1: vname = vname + ' oxy'
-    if esx[6]  == 1: vname = vname + ' ph'
-    if esx[7]  == 1: vname = vname + ' ni'
-    if esx[8]  == 1: vname = vname + ' si'
-    if esx[9] == 1: vname = vname + ' pvort'
+    #if esx[3]  == 1: vname = vname + ' sal'
+    #if esx[4]  == 1: vname = vname + ' ptemp'
+    #if esx[5]  == 1: vname = vname + ' oxy'
+    #if esx[6]  == 1: vname = vname + ' ph'
+    #if esx[7]  == 1: vname = vname + ' ni'
+    #if esx[8]  == 1: vname = vname + ' si'
+    #if esx[9] == 1: vname = vname + ' pvort'
 		
     # SAVE SOMETHING 
-    eval('save %s vname')
-    print '  '
-    print 'File ', incontrol, ' created and saved as: ',  vname[:lv], '.mat'
-    print ' in:  ', pwd
+    #eval('save %s vname')
+    #print '  '
+    #print 'File ', incontrol, ' created and saved as: ',  vname[:lv], '.mat'
+    #print ' in:  ', pwd
 
     print '  '
     print 'E N D   O F   O M P   A N A L Y S I S'
+    plt.show()
