@@ -51,7 +51,8 @@ print '  '
 ### FROM incontr2: #### 
 OMP = 'cla'
 dataset = '/Users/elizabethdrenkard/TOOLS/omp2mats/testdata.mat'
-selection='(press>300) & (press<500)'
+selection=  '(pdens>26.3) & (pdens <27) & (oxy>=20) & (press>300) & (press<500)' 
+#'(press>300) & (press<500)'
 #'(pdens>26.3) & (pdens <27) & (oxy>=20) & (press>300) & (press<500)'
 switchpot = 'n'
 iox = 'y' # oxygen switch
@@ -61,7 +62,7 @@ isi = 'n' # silicate switch
 weightset='/Users/elizabethdrenkard/TOOLS/omp2mats/testwght.mat'
 swtypes = 'qwt2'
 wm = 2
-qwt_pos = [0,1,2,3] # changed from [1,2,3,4]
+qwt_pos = [0,1,4,5] # changed from [1,2,3,4]
 #####################
 
 mat_dat=scipy.io.loadmat(dataset)
