@@ -465,7 +465,6 @@ if esx[9] == 1:
 G1[i,:] = G0[6,:]
 print G1
 
-
 # This is the main part of it all: The call to omp2.m which does the analysis
 omp2
 
