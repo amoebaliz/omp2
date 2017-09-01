@@ -23,14 +23,18 @@ def qwt2(wm_row,ict):
 
     wts=np.array(( \
     # WATER TYPE MATRIX
-    (   10,  34.56,   91,   2.1,   30,   40,  1.0,  0.03),   #1 lower AAMW
-    ( 16.4,  34.55,  100,   1.4,   19,   25,  1.0,  1.12),   #2 upper AAMW  
-    (    9,  34.65,  260,   1.1,   15,    5,  1.0,  0.03),   #3 lower ICW, first set
-    (   18,   35.8,  230,     0,    0,  0.5,  1.0,  0.05),   #4 upper ICW, first set
-    (    9,  34.72,  209,  1.47,   20,    5,  1.0,  0.03),   #5 lower ICW, second set
-    (14.35,   35.4,  224,   0.6,  6.5,  0.5,  1.0,  0.05),   #6 upper ICW, second set
-    (  4.5,  34.35,  210,   2.2,   32,   35,  1.0,  0.30),   #7 AAIW
-    (  8.5,     35,   60,   2.5,   35,   60,  1.0,  0.04)))  #8 IEW
+    #(   10,  34.56,   91,   2.1,   30,   40,  1.0,  0.03),   #1 lower AAMW
+    #( 16.4,  34.55,  100,   1.4,   19,   25,  1.0,  1.12),   #2 upper AAMW  
+    #(    9,  34.65,  260,   1.1,   15,    5,  1.0,  0.03),   #3 lower ICW, first set
+    #(   18,   35.8,  230,     0,    0,  0.5,  1.0,  0.05),   #4 upper ICW, first set
+    #(    9,  34.72,  209,  1.47,   20,    5,  1.0,  0.03),   #5 lower ICW, second set
+    #(14.35,   35.4,  224,   0.6,  6.5,  0.5,  1.0,  0.05),   #6 upper ICW, second set
+    #(  4.5,  34.35,  210,   2.2,   32,   35,  1.0,  0.30),   #7 AAIW
+    #(  8.5,     35,   60,   2.5,   35,   60,  1.0,  0.04)))  #8 IEW
+
+    (T,sal,0,0,0,0,0,                                  0),   # Pacfic Equatorial Water
+    (T,sal,0,0,0,0,0,                                  0),   # Pacfic SubArctic Water
+    (T,sal,0,0,0,0,0,                                  0)))  # North Pacific Central Water
 
     G1=np.transpose(wts[wm_row,:])
     allsize = wts.shape
