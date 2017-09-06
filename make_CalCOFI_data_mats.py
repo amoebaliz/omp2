@@ -33,18 +33,22 @@ def insertIntoDataStruct(name,val,aDict):
     else:
         aDict[name].append((val))
 # SELECT STATION FOR SPECIFIC WATER TYPE
-wt = 2
+wt = 1
 pkt = .2  # Buffer for potential density (isopycnal) values 
 mkt = .2
 
 
-# WATER MASS SAMPLES: 
+# WATER MASS SAMPLES:
+wt_lab = ['Pacific Sub Arctic Water', \
+          'Pacific Equatorial Water', \
+          'North Pacific Central Water']
+ 
 stat_ids = ['080.0 080.0', '093.3 030.0','093.3 110.0']
 iso_pyc = [25.8,26.5,26.5]
 
 # OPEN/READ IN THE CalCOFI DATA FILE
-#op_fil = open('/Users/liz.drenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
-op_fil = open('/Users/elizabethdrenkard/Desktop/OMP/194903-201402_Bottle.csv','rU')
+op_fil = open('/Users/liz.drenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
+#op_fil = open('/Users/elizabethdrenkard/Desktop/OMP/194903-201402_Bottle.csv','rU')
 rd_fil = csv.reader(op_fil, delimiter=',')
 
 # VARIABLES USED FOR WATER TYPE DEF
@@ -56,9 +60,9 @@ CCS_sw_iso_dict = {}
 # EXTRACT DATA FOR SPECIFIC STATIONS AND MONTHS 
 for row in rd_fil:
     if (row[2] == stat_ids[wt] and \
-       #(70<=int(row[3][3:5])<80) and \
-       (2<int(row[3][5:7])<6) and \
-#       (5<int(row[3][5:7])<10) and \
+#       (97<=int(row[3][3:5])<=99) and \
+       (8<int(row[3][5:7])) and \
+#       (8<int(row[3][5:7])) and \
        (len(row[51])>0) and \
        (len(row[52])>0) and \
        (len(row[53])>0) and \
@@ -69,14 +73,23 @@ for row in rd_fil:
        # ALL DATA DICTIONARY
        for nvar in range(len(sw_vars)):
            insertIntoDataStruct(sw_vars[nvar], np.float64(row[nrow[nvar]]),CCS_sw_dict)
-
+ 
        # ISOPYCNAL RESTRICTION
        if ((np.float(row[53])>iso_pyc[wt]-mkt) and \
            (np.float(row[53])<iso_pyc[wt]+pkt)):
 
-           # PUT SPECIFIC STATION/SEASONAL DATA IN DICTIONARY
-           for nvar in range(len(sw_vars)): 
-               insertIntoDataStruct(sw_vars[nvar], np.float64(row[nrow[nvar]]),CCS_sw_iso_dict)
+           if ((int(row[3][3:5]) == 97) and (8<int(row[3][5:7]))):# or \
+              #((int(row[3][3:5]) == 99) and (int(row[3][5:7])<=3)) :
+
+             
+              # PUT SPECIFIC STATION/SEASONAL DATA IN DICTIONARY
+              for nvar in range(len(sw_vars)): 
+                  insertIntoDataStruct(sw_vars[nvar], np.float64(row[nrow[nvar]]),CCS_sw_iso_dict)
+
+           elif (int(row[3][3:5]) == 98):
+              for nvar in range(len(sw_vars)): 
+                  insertIntoDataStruct(sw_vars[nvar], np.float64(row[nrow[nvar]]),CCS_sw_iso_dict)
+  
 
 # ANALYSIS AND PLOTTING
 
