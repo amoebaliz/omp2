@@ -54,8 +54,10 @@ def qwt2(wm_row,ict):
     #            the AAMW contributions, calling qwt2([1 7 2]) will not.)
     #
     import numpy as np
-    wm = ('AAMW', 'AAMW',  'ICW', 'ICW',\
-          'ICW' , 'ICW' , 'AAIW', 'IEW')
+    wm = ('PSA', 'PSA', 'PEW', 'PEW', 'NPCW', 'NPCW')
+    #wm = ('AAMW', 'AAMW',  'ICW', 'ICW',\
+    #      'ICW' , 'ICW' , 'AAIW', 'IEW')
+
     #wm[:5]    = ' AAMW' #                       first row
     #wm[5:10]  = ' AAMW' #                       second row
     #wm[10:15] = '  ICW' # upper, first set      third row
@@ -71,15 +73,21 @@ def qwt2(wm_row,ict):
 
     wts=np.array(( \
 
-    (   10,  34.56,   91,   2.1,   30,   40,  1.0,  0.03),   #1 lower AAMW
-    ( 16.4,  34.55,  100,   1.4,   19,   25,  1.0,  1.12),   #2 upper AAMW  
-    (    9,  34.65,  260,   1.1,   15,    5,  1.0,  0.03),   #3 lower ICW, first set
-    (   18,   35.8,  230,     0,    0,  0.5,  1.0,  0.05),   #4 upper ICW, first set
-    (    9,  34.72,  209,  1.47,   20,    5,  1.0,  0.03),   #5 lower ICW, second set
-    (14.35,   35.4,  224,   0.6,  6.5,  0.5,  1.0,  0.05),   #6 upper ICW, second set
-    (  4.5,  34.35,  210,   2.2,   32,   35,  1.0,  0.30),   #7 AAIW
-    (  8.5,     35,   60,   2.5,   35,   60,  1.0,  0.04)))  #8 IEW
-    print 'WM_ROW', wm_row
+#    (   10,  34.56,   91,   2.1,   30,   40,  1.0,  0.03),   #1 lower AAMW
+#    ( 16.4,  34.55,  100,   1.4,   19,   25,  1.0,  1.12),   #2 upper AAMW  
+#    (    9,  34.65,  260,   1.1,   15,    5,  1.0,  0.03),   #3 lower ICW, first set
+#    (   18,   35.8,  230,     0,    0,  0.5,  1.0,  0.05),   #4 upper ICW, first set
+#    (    9,  34.72,  209,  1.47,   20,    5,  1.0,  0.03),   #5 lower ICW, second set
+#    (14.35,   35.4,  224,   0.6,  6.5,  0.5,  1.0,  0.05),   #6 upper ICW, second set
+#    (  4.5,  34.35,  210,   2.2,   32,   35,  1.0,  0.30),   #7 AAIW
+#    (  8.5,     35,   60,   2.5,   35,   60,  1.0,  0.04)))  #8 IEW
+#    print 'WM_ROW', wm_row
+     (  9.1,  33.50, 3.91,  1.56,  0.0, 20.30, 1.0,  0.0), # lower PSA
+     (11.34,  33.58, 4.93,  1.14,  0.0, 11.25, 1.0,  0.0), # upper PSA
+     ( 7.37,  34.04, 2.45,  2.32,  0.0, 43.42, 1.0,  0.0), # lower PEW
+     ( 9.75,  33.85, 3.66,  1.68,  0.0, 23.65, 1.0,  0.0), # upper PEW
+     ( 6.94,  34.06, 2.15,  2.43,  0.0, 49.97, 1.0   0.0), # lower NPCW
+     ( 9.14,  33.97, 3.24,  1.80,  0.0, 26.16, 1.0,  0.0), # upper NPCW
     G1=np.transpose(wts[wm_row,:])
     allsize = wts.shape
 

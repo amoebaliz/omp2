@@ -31,7 +31,10 @@ import matplotlib.pyplot as plt
 
 # load dataset from source region of a water mass 
 # (*.MAT file in standard format):
-load source_data
+# load source_data
+
+# PYTHON READ IN
+#CCS_sw_dict = np.load()
 
 # flags: insert here what kind of flag is used (eg. -9, NaN, 99999, etc.) 
 flag=np.nan
@@ -44,7 +47,7 @@ fit_max=16.4
 fit_min=10
 
 # names of "dependent" parameter to be fitted (as string variable ' ';' ')
-para=[' sal',' oxy','  ph','  ni']
+# para=[' sal',' oxy','  ph','  ni']
 
 # ------------------------------------------------------
 # |                    FROM HERE ON:                   | 
