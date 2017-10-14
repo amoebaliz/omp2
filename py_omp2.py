@@ -15,26 +15,26 @@ from omp2 import omp2
 def qwt2(wm_row,ict):
 
     # WATER MASS ID VALUES
-    wm = ('AAMW', 'AAMW',  'ICW', 'ICW','ICW' , 'ICW' , 'AAIW', 'IEW')
+    wm = ('PSA', 'PSA', 'PEW', 'PEW', 'NPCW', 'NPCW')
+    
+    # WATER TYPE MATRIX
+    # lower PSA
+    # upper PSA
+    # lower PEW
+    # upper PEW
+    # lower NPCW
+    # upper NPCW
 
     #  The following lines define the water types. The order of parameters is
-    #  ptemp    sal      oxy    PO4     NO3    Si    mass   pvort
     #  Note: potential vorticity is multiplied by 10*8.
-
     wts=np.array(( \
-    # WATER TYPE MATRIX
-    #(   10,  34.56,   91,   2.1,   30,   40,  1.0,  0.03),   #1 lower AAMW
-    #( 16.4,  34.55,  100,   1.4,   19,   25,  1.0,  1.12),   #2 upper AAMW  
-    #(    9,  34.65,  260,   1.1,   15,    5,  1.0,  0.03),   #3 lower ICW, first set
-    #(   18,   35.8,  230,     0,    0,  0.5,  1.0,  0.05),   #4 upper ICW, first set
-    #(    9,  34.72,  209,  1.47,   20,    5,  1.0,  0.03),   #5 lower ICW, second set
-    #(14.35,   35.4,  224,   0.6,  6.5,  0.5,  1.0,  0.05),   #6 upper ICW, second set
-    #(  4.5,  34.35,  210,   2.2,   32,   35,  1.0,  0.30),   #7 AAIW
-    #(  8.5,     35,   60,   2.5,   35,   60,  1.0,  0.04)))  #8 IEW
-
-    (T,sal,0,0,0,0,0,                                  0),   # Pacfic Equatorial Water
-    (T,sal,0,0,0,0,0,                                  0),   # Pacfic SubArctic Water
-    (T,sal,0,0,0,0,0,                                  0)))  # North Pacific Central Water
+    # PTEMP   SALT    OXY    PO4   NO3   SILICATE   mass   pvort
+    (  9.1,  33.50,  3.91,  1.56,  0.0,     20.30,   1.0,   0.0),\
+    (11.34,  33.58,  4.93,  1.14,  0.0,     11.25,   1.0,   0.0),\
+    ( 7.37,  34.04,  2.45,  2.32,  0.0,     43.42,   1.0,   0.0),\
+    ( 9.75,  33.85,  3.66,  1.68,  0.0,     23.65,   1.0,   0.0),\
+    ( 6.94,  34.06,  2.15,  2.43,  0.0,     49.97,   1.0,   0.0),\
+    ( 9.14,  33.97,  3.24,  1.80,  0.0,     26.16,   1.0,   0.0))) 
 
     G1=np.transpose(wts[wm_row,:])
     allsize = wts.shape
@@ -96,7 +96,8 @@ print '  '
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP = 'cla' # classical OMP analysis
 # data location
-dataset = '/Users/elizabethdrenkard/TOOLS/omp2mats/testdata.mat'
+dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+
 # data limitations
 selection=  '(pdens>=23) & (pdens<=28) & (oxy>=20) & (press>300) & (press<600)' 
 # Select/deselect potential vorticity by setting switchpot to 'y' or 'n':
@@ -104,24 +105,27 @@ switchpot = 'n'
 # Select/deselect variables by setting corresponding switches to 'y' or 'n':
 iox = 1 #'y' # oxygen switch
 iph = 1 #'y' # phosphate switch
-ini = 1 #'y' # nitrate switch
-isi = 0 #'n' # silicate switch
-var_switches = [1,1,1,0]
+ini = 0 #'n' # nitrate switch
+isi = 1 #'y' # silicate switch
+var_switches = [1,1,0,1]
 # file which contains the weights 
 weightset='/Users/elizabethdrenkard/TOOLS/omp2mats/testwght.mat'
 # number of water masses to be included in the analysis
-wm = 2
+wm = 3
 #  Select the water type numbers (row in the water type matrix)
-qwt_pos = [0,1,4,5] # changed from [1,2,3,4]
+qwt_pos = [0,2,4] # changed from [1,2,3,4]
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Loading .mat files into python - soon to be netCDF
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mat_dat=scipy.io.loadmat(dataset)
+#mat_dat=scipy.io.loadmat(dataset)
+mat_dat=np.load(dataset).item()
+print mat_dat.keys()
 globals().update(mat_dat)
-
-weight_dat=scipy.io.loadmat(weightset)
+print 'MEEP'
+#weight_dat=scipy.io.loadmat(weightset)
+weight_dat=np.load(weightset).item()
 globals().update(weight_dat)
 
 # vars = ['press','sal','ptemp','oxy','ph','ni','si','pvort','temp']
@@ -167,14 +171,14 @@ cumdist=np.append(0, np.cumsum(dist))
 # in the user manual. This should not be of concern but has to be watched when changing the code.
 
 eex = np.zeros(11) # index of available variables:
-key_vars = ['lat','long','press','sal','ptemp','oxy','ph','ni','si','pvort','temp']
+key_vars = ['LAT','LONG','press','SALINITY','PTEMP','OXYGEN','ph','ni','SILICATE','pvort','temp']
 for n in range(len(key_vars)):
     if key_vars[n] in globals():
        eex[n]=1
     elif n == len(key_vars)-1:
        temp = sw_temp(sal,ptemp,press,0)
        eex[n]=1
-
+print eex
 # Determine the number of variables used in this run:
 esx=np.copy(eex) # index of selected variables
 nvar = 3 + np.sum(var_switches)
