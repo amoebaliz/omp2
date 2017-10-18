@@ -96,8 +96,8 @@ print '  '
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP = 'cla' # classical OMP analysis
 # data location
-dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
-
+#dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
 # data limitations
 selection=  '(pdens>=23) & (pdens<=28) & (oxy>=20) & (press>300) & (press<600)' 
 # Select/deselect potential vorticity by setting switchpot to 'y' or 'n':
@@ -109,7 +109,8 @@ ini = 0 #'n' # nitrate switch
 isi = 1 #'y' # silicate switch
 var_switches = [1,1,0,1]
 # file which contains the weights 
-weightset='/Users/elizabethdrenkard/TOOLS/omp2mats/testwght.mat'
+# weightset='/Users/elizabethdrenkard/TOOLS/omp2mats/testwght.mat'
+weightset='testwght.npy'
 # number of water masses to be included in the analysis
 wm = 3
 #  Select the water type numbers (row in the water type matrix)
@@ -123,32 +124,21 @@ qwt_pos = [0,2,4] # changed from [1,2,3,4]
 mat_dat=np.load(dataset).item()
 print mat_dat.keys()
 globals().update(mat_dat)
-print 'MEEP'
+
+
+#lat =
+#lon =
 #weight_dat=scipy.io.loadmat(weightset)
 weight_dat=np.load(weightset).item()
 globals().update(weight_dat)
+print 'MEEP'
 
-# vars = ['press','sal','ptemp','oxy','ph','ni','si','pvort','temp']
-# roms_vars = 
-# lat = 
-# lon = 
-# ncfil = 
-# fid = nc.Dataset(ncfil)
-# for nvar in vars:
-#      exec(np.ravel(nvar = fid.variables[roms_vars[n]][:].squeeze())
-# lat = 
-# lon = 
-# temp = 
-# sal = 
-# press = 
+print 'NEED LAT/LON OF STATIONS IN THE ORIGINAL DATA INPUT'
 
-#fig, ax = plt.subplots()
-dist,phaseangle = sw_dist(lat.squeeze(),long.squeeze(),'km')
+dist,phaseangle = sw_dist(lat.squeeze(),lon.squeeze(),'km')
 cumdist=np.append(0, np.cumsum(dist))
-#ax.plot(cumdist,press.squeeze(),'ko')
-#ax.invert_yaxis()
-#plt.show()
 
+print 'MEEP - 2'
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Variables available for/ to use in analysis
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
