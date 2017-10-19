@@ -23,7 +23,7 @@
 #   or  matthias.tomczak@flinders.edu.au
 # --------------------------------------------
 
-def contour2(ctpara, tit_str, A, lat, long, press):
+def contour2(ctpara, tit_str, A, lat, lon, press):
     import numpy as np
     import matplotlib.pyplot as plt
     from scipy.interpolate import griddata
@@ -32,7 +32,7 @@ def contour2(ctpara, tit_str, A, lat, long, press):
     para=A[ctpara,:]*100
 
     # calculate distance between stations
-    dist,phaseangle = sw_dist(lat,long,'km')
+    dist = sw_dist(lat,lon,'km')
 
     #if dist.size[0]>1:
     #   dist=dist'
@@ -81,4 +81,3 @@ def contour2(ctpara, tit_str, A, lat, long, press):
     tit_text = tit_str + ' water mass content (percent)'
     plt.title(tit_text)
     #set(gca,'box','on')
-

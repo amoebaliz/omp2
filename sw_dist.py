@@ -100,5 +100,5 @@ def sw_dist(lat,lon,units):
     # end %if
 
     # CALCUALTE ANGLE TO X AXIS
-    phaseangle  = np.angle(dep+dlat*np.sqrt(-1))*RAD2DEG
-    return dist, phaseangle
+    #phaseangle  = np.angle(dep+dlat*np.sqrt(-1))*RAD2DEG
+    return dist#, phaseangle

@@ -27,7 +27,7 @@
 #   or  matthias.tomczak@flinders.edu.au
 
 # 
-def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,esx,press,sal,oxy,ptemp,temp,pdens,ph,ni,G1,wm_index):
+def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index):    
     from norm_qwt import norm_qwt
     import scipy
     import numpy as np
@@ -36,12 +36,7 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
     print '  '
     print 'OMP analysis now running. ', str(len(lat)) + ' data points found.'
     print '  '
-    #starttime = clock;
     gap=0
-
-    # Cut the data to the selcted range 
-    # 
-    # set potential vorticity to positive values (independent of hemisphere) if required
 
     print 'Screening the data and reducing them to the selected range.'
     print '  '
@@ -50,12 +45,13 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
 	 eval('index=np.where((imag[pvort]==0) & (pvort<100) & (selection ))')
 	 pvort = abs(pvort)
     else:
+         print selection
+         print np.min(pdens), np.max(pdens), np.min(press),np.max(press)
          exec('index = np.where(' + selection + ')[0]')
 
-    print len(index)
     lat   = lat[index]
     press = press[index]
-    long  = long[index]
+    lon   = lon[index]
     sal   = sal[index]
 
     #lat   =  np.transpose(lat[index])
@@ -75,13 +71,13 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
        pdens = pdens[index]
     else:
        pdens = sw_dens0(sal,temp) - 1000
-    if esx[6] == 1: 
+    if esx[5] == 1: 
        oxy =  oxy[index]
-    if esx[7] == 1: 
+    if esx[6] == 1: 
        ph  =  ph[index]
-    if esx[8] == 1: 
+    if esx[7] == 1: 
        ni  =  ni[index]
-    if esx[9] == 1: 
+    if esx[8] == 1: 
        si  =  si[index]
     del index
 
@@ -117,7 +113,6 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
     if OMP == 'ext':
        biogeo=np.zeros[1,len(lat)]-nan 
     A = np.zeros((wm_index[len(wm_index)-1],len(lat)))
-
     # Vector of each datapoint (btst) is build here
     for k in range(len(lat)):
 	# selecting the correct parameters
@@ -128,12 +123,13 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
            btst = np.append(btst,ph[k])
         if esx[7] == 1:  
            btst = np.append(btst,ni[k])
-           if esx[8] == 1:
-              btst = np.append(btst,si[k])  
+        if esx[8] == 1:
+           btst = np.append(btst,si[k])  
         if 'pdens'in locals():
            pden_dat = pdens[k]
-           if esx[9] == 1:
-              btst = np.append(btst,pvort[k])
+        if esx[9] == 1:
+           btst = np.append(btst,pvort[k])
+
         btst = np.append(btst,1)
 
         index1=np.where(~np.isnan(btst))[0]
@@ -185,14 +181,13 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
         #end of loop with enough data
 
        ## end of data point loop
-
     #summary of run:
     print '  '
     print '  '
     print '  '
     print 'P R O G R A M   R U N   S U M M A R Y :'
     print '---------------------------------------'
-
+    
     if OMP == 'ext':
        print 'Method used:   EXTENDED OMP ANALYSIS.'
     else:
@@ -215,7 +210,7 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
     print '  '
     print 'Water types used:'
     print '  '
-    for i in range(len(qwt_pos)):
+    for i in qwt_pos:
 	print wmnames[i]
     print '  '
     print 'Water type definitions for the selected variables and mass conservation'
@@ -250,7 +245,7 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,long,
        for i in range (nr_of_wm):
 	   ctpara = i
 	   tit_str = tit_index[i]
-	   contour2(ctpara, tit_str, A, lat, long,press)
+	   contour2(ctpara, tit_str, A, lat, lon,press)
     # add a biogeochemistry plot if extended OMP 
     if OMP == 'ext':
        plt.figure()
