@@ -47,8 +47,11 @@ def contour2(ctpara, tit_str, A, lat, lon, press):
     #end
 
     # create regular grid:
-    XI=np.linspace(min(cumdist),max(cumdist),20)
-    YI=np.linspace(min(press),max(press),20)
+#    XI=np.linspace(min(cumdist),max(cumdist),20)
+#    YI=np.linspace(min(press),max(press),20)
+    XI = cumdist
+    YI = np.linspace(min(press),max(press),50)
+    print YI
     X,Y = np.meshgrid(XI, YI)  
     # remove NaN do apply griddata.m
     press1=press[~np.isnan(para)].squeeze()
@@ -57,14 +60,13 @@ def contour2(ctpara, tit_str, A, lat, lon, press):
     # interpolate to regular grid:
     points = np.column_stack((cumdist1, press1))
     para2=griddata(points,para1,(X,Y),method='cubic')
-    #levs = [0,10,20,30,40,50,60,70,80,90,100]   
+
     levs= np.linspace(0, 100.0, 50, endpoint=True)
     fig, ax = plt.subplots(figsize=(12,4))
-    #ax.contour(np.linspace(min(cumdist1),max(cumdist1),20), \
-    #             np.linspace(min(press1),max(press1),20),para2,levs,shading='flat') #,[0:10:100])
 
-    C = ax.contourf(np.linspace(min(cumdist1),max(cumdist1),20), \
-                 np.linspace(min(press),max(press),20),para2,levs,extend = 'both')
+    C = ax.contourf(X,Y,para2,levs,extend = 'both')
+
+
     C.cmap.set_under(C.cmap.colors[0])
     C.cmap.set_over(C.cmap.colors[-1])
     cb = plt.colorbar(C,ticks=[0,20,40,60,80,100])

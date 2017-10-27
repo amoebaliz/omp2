@@ -37,14 +37,14 @@ line_num = 93.3
 
 # OPEN/READ IN THE CalCOFI DATA FILE
 # SWFSC
-#dat_fil = open('/Users/liz.drenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
-#pos_fil = open('')
+dat_fil = open('/Users/liz.drenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
+#pos_fil = open('/Users/liz.drenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv')
 # MACBOOK
-dat_fil = open('/Users/elizabethdrenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
-pos_fil = open('/Users/elizabethdrenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv','rU')
+#dat_fil = open('/Users/elizabethdrenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
+#pos_fil = open('/Users/elizabethdrenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv','rU')
 
 rd_dat_fil = csv.reader(dat_fil, delimiter=',')
-rd_pos_fil = csv.reader(pos_fil, delimiter=',')
+#rd_pos_fil = csv.reader(pos_fil, delimiter=',')
 
 # VARIABLES USED FOR WATER TYPE DEF
 sw_vars = ['DEPTH','PTEMP','SALINITY','PDENS','OXYGEN','SILICATE','PHOSPHATE','PRESS']
@@ -64,7 +64,7 @@ for row in rd_dat_fil:
        (len(row[59])>0)):
        insertIntoDataStruct('STATION', float(row[2][5:]),CCS_sw_dict)
        # ADD LAT/LON BASED ON LINE AND STATION
-       pos_fil = open('/Users/elizabethdrenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv','rU')
+       pos_fil = open('/Users/liz.drenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv','rU')
        rd_pos_fil = csv.reader(pos_fil, delimiter=',')
        for p_row in rd_pos_fil:
            if ((p_row[1] == str(line_num)) and (float(p_row[2]) == float(row[2][5:]))): 

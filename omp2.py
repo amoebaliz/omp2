@@ -33,6 +33,7 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,e
     import numpy as np
     import matplotlib.pyplot as plt
     from contour2 import contour2
+    from wm_prop import wm_prop
     print '  '
     print 'OMP analysis now running. ', str(len(lat)) + ' data points found.'
     print '  '
@@ -226,35 +227,34 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,e
     print '(mass conservation residual) against density.'
 
 
-    # plotting residuals
-    fig, ax = plt.subplots()
-    ax.plot(100*err[m-1,:],pdens,'o')
+    # PLOTTING RESIDUALS
+#    fig, ax = plt.subplots()
+#    ax.plot(100*err[m-1,:],pdens,'o')
     #ax.set_ylim([22,28])
     #ax.set_xlim([-50,150])
-    ax.invert_yaxis()
-    ax.set_xlabel('mass conservation residual of fit (%)')
-    ax.set_ylabel('density')
-    print '  '
-    j = 'n'
-    incontrol = input('Do you want to see more graphic output (y/n)?  [n]  ')
-    if len(incontrol) > 0: 
-       j = incontrol
-
-    if j == 'y':
+#    ax.invert_yaxis()
+#    ax.set_xlabel('mass conservation residual of fit (%)')
+#    ax.set_ylabel('density')
+#    print '  '
+#    j = 'n'
+#    incontrol = input('Do you want to see more graphic output (y/n)?  [n]  ')
+#    print A.shape
+#    if len(incontrol) > 0: 
+#       j = incontrol
+    
+#    if j == 'y':
        # plotting water mass fractions
-       for i in range (nr_of_wm):
-	   ctpara = i
-	   tit_str = tit_index[i]
-	   contour2(ctpara, tit_str, A, lat, lon,press)
-    # add a biogeochemistry plot if extended OMP 
-    if OMP == 'ext':
-       plt.figure()
-       contour_bio
-    print tit_index
-    print '  '
-
+#       for i in range (nr_of_wm):
+#	   ctpara = i
+#	   tit_str = tit_index[i]
+#	   contour2(ctpara, tit_str, A, lat, lon,press)
+    sur_frac = np.zeros((nr_of_wm,len(set(lon))))
+    for i in range (nr_of_wm):
+        ctpara = i
+        tit_str = tit_index[i]
+        sur_frac[i,:] = wm_prop(ctpara, tit_str, A, lat, lon, press) # SEND TO WATERMASS PROPORTION ANALYSIS
+    #return sur_frac
     # storing data in directory/folder OUTPUT
-    j = 'y'
     #incontrol = input('Do you want to store your results (y/n)?  [y]  ')
     #if len(incontrol) > 0:
     #   j = incontrol

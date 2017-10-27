@@ -90,8 +90,8 @@ print '  '
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP = 'cla' # classical OMP analysis
 # data location
-#dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
-dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+#dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
 # data limitations
 selection=  '(pdens>=23) & (pdens<=28)'# & (press>300) & (press<600)' 
 # Select/deselect potential vorticity by setting switchpot to 'y' or 'n':
@@ -185,7 +185,7 @@ nr_of_wm = wm_index[len(wm_index)-1]
 i = (0,1,2,3,5,6)
 G1 = G0[i,:]
 
-for yr in range(1995,2014+1):
+for yr in range(1994,2014+1):
     Iy = np.where(np.array(mat_dat['YEAR'])==yr)
     if len(Iy[0])>30:
        mons = np.array(list(set(np.array(mat_dat['MONTH'])[Iy[0]])))
