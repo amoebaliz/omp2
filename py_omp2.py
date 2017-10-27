@@ -184,8 +184,9 @@ nr_of_wm = wm_index[len(wm_index)-1]
 # PTEMP, SALT, OXYGEN, PHOS, SI, MASS
 i = (0,1,2,3,5,6)
 G1 = G0[i,:]
-
-for yr in range(1994,2014+1):
+surf_frac = np.zeros((25,3,15))
+n=0
+for yr in range(1990,2014+1):
     Iy = np.where(np.array(mat_dat['YEAR'])==yr)
     if len(Iy[0])>30:
        mons = np.array(list(set(np.array(mat_dat['MONTH'])[Iy[0]])))
@@ -206,9 +207,9 @@ for yr in range(1994,2014+1):
            #dist,phaseangle = sw_dist(lat.squeeze(),lon.squeeze(),'km')
            cumdist=np.append(0, np.cumsum(dist))
            # This is the main part of it all: The call to omp2.m which does the analysis
-           omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
-
-
+           surf_frac[n,:] = omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
+           n+=1
+np.save('water_mass_fractions_75m',surf_frac)
 #ORIGINAL esx calculation method
 #eex = np.zeros(11) # index of available variables:
 #key_vars = ['LAT','LONG','press','SALINITY','PTEMP','OXYGEN','PHOSPHATE','ni','SILICATE','pvort','temp']

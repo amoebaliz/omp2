@@ -291,4 +291,4 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,e
 
     print '  '
     print 'E N D   O F   O M P   A N A L Y S I S'
-    plt.show()
+    return sur_frac
