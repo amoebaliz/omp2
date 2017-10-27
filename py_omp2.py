@@ -185,13 +185,13 @@ nr_of_wm = wm_index[len(wm_index)-1]
 i = (0,1,2,3,5,6)
 G1 = G0[i,:]
 
-for yr in range(1992,2014+1):
+for yr in range(1995,2014+1):
     Iy = np.where(np.array(mat_dat['YEAR'])==yr)
-    if len(Iy[0])>0:
-       for mon in list(set(np.array(mat_dat['MONTH'])[Iy[0]])):
-           # ISSUE WITH NP.WHERE: twp conditions
-           I = np.where((np.array(mat_dat['YEAR'])==yr) and (np.array(mat_dat['MONTH'])==mon))
-           print yr, len(I[0]), np.array(mat_dat['MONTH'])[I[0]]
+    if len(Iy[0])>30:
+       mons = np.array(list(set(np.array(mat_dat['MONTH'])[Iy[0]])))
+       for mon in mons[(mons>2) & (mons<7)]:
+           print yr, mon
+           I = np.where((np.array(mat_dat['YEAR'])==yr) & (np.array(mat_dat['MONTH'])==mon))
            lat = np.array(mat_dat['LAT'])[I[0]]
            lon = np.array(mat_dat['LONG'])[I[0]]
            ptemp = np.array(mat_dat['PTEMP'])[I[0]] 

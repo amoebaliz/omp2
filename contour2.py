@@ -57,24 +57,26 @@ def contour2(ctpara, tit_str, A, lat, lon, press):
     # interpolate to regular grid:
     points = np.column_stack((cumdist1, press1))
     para2=griddata(points,para1,(X,Y),method='cubic')
-    levs = [0,10,20,30,40,50,60,70,80,90,100]   
- 
-    fig, ax = plt.subplots()
-    ax.contour(np.linspace(min(cumdist1),max(cumdist1),20), \
-                 np.linspace(min(press1),max(press1),20),para2,levs,shading='flat') #,[0:10:100])
+    #levs = [0,10,20,30,40,50,60,70,80,90,100]   
+    levs= np.linspace(0, 100.0, 50, endpoint=True)
+    fig, ax = plt.subplots(figsize=(12,4))
+    #ax.contour(np.linspace(min(cumdist1),max(cumdist1),20), \
+    #             np.linspace(min(press1),max(press1),20),para2,levs,shading='flat') #,[0:10:100])
 
-    C = ax.contour(np.linspace(min(cumdist1),max(cumdist1),20), \
-                 np.linspace(min(press),max(press),20),para2,levs,shading='flat') # ,[0:10:100]);
-
-    plt.clabel(C, inline=1, fontsize=10)
+    C = ax.contourf(np.linspace(min(cumdist1),max(cumdist1),20), \
+                 np.linspace(min(press),max(press),20),para2,levs,extend = 'both')
+    C.cmap.set_under(C.cmap.colors[0])
+    C.cmap.set_over(C.cmap.colors[-1])
+    cb = plt.colorbar(C,ticks=[0,20,40,60,80,100])
+    #plt.clabel(C, inline=1, fontsize=10)
     #clabel(C,[0 20 40 60 80])
     #colormap gray
     #axis ij
-    plt.plot(cumdist,press,'ko')
+    plt.plot(cumdist,press,'ko',markersize=2)
     #caxis([-50 100])
     #set(gca,'position',[.1 .1 .85 .5])
     #ax.invert_yaxis()
-    ax.set_ylim([300,500])
+    ax.set_ylim([10,500])
     ax.invert_yaxis()
     ax.set_xlabel('distance (km)') 
     ax.set_ylabel('pressure (dbar)')
