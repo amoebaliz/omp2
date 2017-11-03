@@ -11,7 +11,7 @@ import math
 import pyroms
 import matplotlib.pyplot as plt
 from omp2 import omp2 
-
+from collections import Counter
 def qwt2(wm_row,ict):
 
     # WATER MASS ID VALUES
@@ -184,8 +184,10 @@ nr_of_wm = wm_index[len(wm_index)-1]
 # PTEMP, SALT, OXYGEN, PHOS, SI, MASS
 i = (0,1,2,3,5,6)
 G1 = G0[i,:]
-surf_frac = np.zeros((25,3,15))
+surf_frac = np.empty((25,3,15)) # for line 93.3
+surf_frac[:] = np.NAN
 n=0
+
 for yr in range(1990,2014+1):
     Iy = np.where(np.array(mat_dat['YEAR'])==yr)
     if len(Iy[0])>30:
@@ -193,6 +195,7 @@ for yr in range(1990,2014+1):
        for mon in mons[(mons>2) & (mons<7)]:
            print yr, mon
            I = np.where((np.array(mat_dat['YEAR'])==yr) & (np.array(mat_dat['MONTH'])==mon))
+           stats = np.array(mat_dat['STATION'])[I[0]]
            lat = np.array(mat_dat['LAT'])[I[0]]
            lon = np.array(mat_dat['LONG'])[I[0]]
            ptemp = np.array(mat_dat['PTEMP'])[I[0]] 
@@ -202,12 +205,12 @@ for yr in range(1990,2014+1):
            ph = np.array(mat_dat['PHOSPHATE'])[I[0]]
            si = np.array(mat_dat['SILICATE'])[I[0]]
            press = np.array(mat_dat['PRESS'])[I[0]]
-
+           print stats
            dist = sw_dist(lat.squeeze(),lon.squeeze(),'km')
            #dist,phaseangle = sw_dist(lat.squeeze(),lon.squeeze(),'km')
            cumdist=np.append(0, np.cumsum(dist))
            # This is the main part of it all: The call to omp2.m which does the analysis
-           surf_frac[n,:] = omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
+           surf_frac[n,:] = omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stats,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
            n+=1
 np.save('water_mass_fractions_75m',surf_frac)
 #ORIGINAL esx calculation method

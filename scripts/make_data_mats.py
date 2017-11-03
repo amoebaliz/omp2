@@ -54,6 +54,7 @@ nrow    = [49,51,52,53,56,58,59,65]
 CCS_sw_dict = {}
 s=''
 # EXTRACT DATA FOR SPECIFIC STATIONS AND MONTHS 
+sta=0
 for row in rd_dat_fil:
     if (row[2][:5] == str(line_num).zfill(5) and \
        (len(row[51])>0) and \
@@ -62,16 +63,14 @@ for row in rd_dat_fil:
        (len(row[56])>0) and \
        (len(row[58])>0) and \
        (len(row[59])>0)):
-       insertIntoDataStruct('STATION', float(row[2][5:]),CCS_sw_dict)
        # ADD LAT/LON BASED ON LINE AND STATION
        pos_fil = open('/Users/liz.drenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv','rU')
        rd_pos_fil = csv.reader(pos_fil, delimiter=',')
        for p_row in rd_pos_fil:
-           if ((p_row[1] == str(line_num)) and (float(p_row[2]) == float(row[2][5:]))): 
+           if ((p_row[1] == str(line_num)) and (float(p_row[2]) == float(row[2][5:]))):
               insertIntoDataStruct('STATION', float(row[2][5:]),CCS_sw_dict)
               insertIntoDataStruct('LAT',float(p_row[3]),CCS_sw_dict)
               insertIntoDataStruct('LONG',float(p_row[4]),CCS_sw_dict)
-
               insertIntoDataStruct('YEAR', int(float(s.join((row[3][:2],row[3][3:5])))),CCS_sw_dict)
               insertIntoDataStruct('MONTH', int(float(row[3][5:7])),CCS_sw_dict)
               insertIntoDataStruct('DAY', int(float(row[3][13:15])),CCS_sw_dict)
