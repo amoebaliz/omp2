@@ -187,8 +187,8 @@ G1 = G0[i,:]
 surf_frac = np.empty((25,3,15)) # for line 93.3
 surf_frac[:] = np.NAN
 n=0
-
-for yr in range(1990,2014+1):
+nsta=15
+for yr in range(1990,1990+1):
     Iy = np.where(np.array(mat_dat['YEAR'])==yr)
     if len(Iy[0])>30:
        mons = np.array(list(set(np.array(mat_dat['MONTH'])[Iy[0]])))
@@ -205,12 +205,12 @@ for yr in range(1990,2014+1):
            ph = np.array(mat_dat['PHOSPHATE'])[I[0]]
            si = np.array(mat_dat['SILICATE'])[I[0]]
            press = np.array(mat_dat['PRESS'])[I[0]]
-           print stats
            dist = sw_dist(lat.squeeze(),lon.squeeze(),'km')
            #dist,phaseangle = sw_dist(lat.squeeze(),lon.squeeze(),'km')
            cumdist=np.append(0, np.cumsum(dist))
            # This is the main part of it all: The call to omp2.m which does the analysis
-           surf_frac[n,:] = omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stats,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
+           surf_frac[n,:] = omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,nsta,stats,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
+           print surf_frac[n,:]
            n+=1
 np.save('water_mass_fractions_75m',surf_frac)
 #ORIGINAL esx calculation method
