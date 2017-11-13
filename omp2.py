@@ -27,7 +27,7 @@
 #   or  matthias.tomczak@flinders.edu.au
 
 # 
-def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,nsta,stats,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index):    
+def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stations,stats,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index):    
     from norm_qwt import norm_qwt
     import scipy
     import numpy as np
@@ -38,7 +38,7 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,nsta,
     print 'OMP analysis now running. ', str(len(lat)) + ' data points found.'
     print '  '
     gap=0
-
+    nsta = len(stations)
     print 'Screening the data and reducing them to the selected range.'
     print '  '
 
@@ -250,7 +250,7 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,nsta,
 #	   contour2(ctpara, tit_str, A, lat, lon,press)
     sur_frac = np.zeros((nr_of_wm,nsta))
     for i in range (nr_of_wm):
-        sur_frac[i,:] = wm_prop(A[i,:]*100, stats, lat, lon, press) # SEND TO WATERMASS PROPORTION ANALYSIS
+        sur_frac[i,:] = wm_prop(A[i,:]*100, stations, stats, lat, lon, press) # SEND TO WATERMASS PROPORTION ANALYSIS
     #return sur_frac
     # storing data in directory/folder OUTPUT
     #incontrol = input('Do you want to store your results (y/n)?  [y]  ')

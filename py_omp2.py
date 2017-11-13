@@ -12,6 +12,9 @@ import pyroms
 import matplotlib.pyplot as plt
 from omp2 import omp2 
 from collections import Counter
+import datetime as dt
+import matplotlib.dates as pltd
+
 def qwt2(wm_row,ict):
 
     # WATER MASS ID VALUES
@@ -91,6 +94,7 @@ print '  '
 OMP = 'cla' # classical OMP analysis
 # data location
 dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+#dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
 #dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
 # data limitations
 selection=  '(pdens>=23) & (pdens<=28)'# & (press>300) & (press<600)' 
@@ -184,11 +188,15 @@ nr_of_wm = wm_index[len(wm_index)-1]
 # PTEMP, SALT, OXYGEN, PHOS, SI, MASS
 i = (0,1,2,3,5,6)
 G1 = G0[i,:]
-surf_frac = np.empty((25,3,15)) # for line 93.3
-surf_frac[:] = np.NAN
-n=0
-nsta=15
-for yr in range(1990,1990+1):
+
+stations = [26.7,28,30,35,40,45,50,55,60,70,80,90,100,110,120] #LINE 93.3
+#stations = [51,55,60,70,80,90,100]                             #LINE 80.0
+#stations = [51,55,60,70,80,90]                                 #LINE 66.7
+nsta=len(stations)
+
+surf_frac = np.array([], dtype=np.int64).reshape(0,wm,nsta)
+cruise_dates = []
+for yr in range(1980,2014+1):
     Iy = np.where(np.array(mat_dat['YEAR'])==yr)
     if len(Iy[0])>30:
        mons = np.array(list(set(np.array(mat_dat['MONTH'])[Iy[0]])))
@@ -209,10 +217,14 @@ for yr in range(1990,1990+1):
            #dist,phaseangle = sw_dist(lat.squeeze(),lon.squeeze(),'km')
            cumdist=np.append(0, np.cumsum(dist))
            # This is the main part of it all: The call to omp2.m which does the analysis
-           surf_frac[n,:] = omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,nsta,stats,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
-           print surf_frac[n,:]
-           n+=1
-np.save('water_mass_fractions_75m',surf_frac)
+           #print omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,nsta,stats,lon,esx,\
+           #                               press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index).reshape(1,wm,nsta).shape
+           #print surf_frac.shape
+           surf_frac = np.concatenate((surf_frac,\
+                       omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stations,stats,lon,esx,\
+                       press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index).reshape(1,wm,nsta)),axis=0) 
+           cruise_dates = np.append(cruise_dates,pltd.date2num(dt.datetime(yr,mon,1)))
+np.savez('water_mass_fractions_200m',surf_frac,cruise_dates)
 #ORIGINAL esx calculation method
 #eex = np.zeros(11) # index of available variables:
 #key_vars = ['LAT','LONG','press','SALINITY','PTEMP','OXYGEN','PHOSPHATE','ni','SILICATE','pvort','temp']

@@ -34,14 +34,13 @@ def insertIntoDataStruct(name,val,aDict):
 # SELECT LINE 
 stat_ids = ['080.0 080.0', '093.3 030.0','093.3 110.0']
 line_num = 93.3
-
+line_num = 80.0
+line_num = 66.7
 # OPEN/READ IN THE CalCOFI DATA FILE
 # SWFSC
 dat_fil = open('/Users/liz.drenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
-#pos_fil = open('/Users/liz.drenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv')
 # MACBOOK
 #dat_fil = open('/Users/elizabethdrenkard/external_data/CalCOFI/194903-201402_Bottle.csv','rU')
-#pos_fil = open('/Users/elizabethdrenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv','rU')
 
 rd_dat_fil = csv.reader(dat_fil, delimiter=',')
 #rd_pos_fil = csv.reader(pos_fil, delimiter=',')
@@ -66,8 +65,11 @@ for row in rd_dat_fil:
        # ADD LAT/LON BASED ON LINE AND STATION
        pos_fil = open('/Users/liz.drenkard/external_data/CalCOFI/CalCOFIStaPosNDepth113.csv','rU')
        rd_pos_fil = csv.reader(pos_fil, delimiter=',')
+       firstline = True
        for p_row in rd_pos_fil:
-           if ((p_row[1] == str(line_num)) and (float(p_row[2]) == float(row[2][5:]))):
+           if firstline:    #skip first line
+              firstline = False
+           elif ((float(p_row[1]) == (line_num)) and (float(p_row[2]) == float(row[2][5:]))):
               insertIntoDataStruct('STATION', float(row[2][5:]),CCS_sw_dict)
               insertIntoDataStruct('LAT',float(p_row[3]),CCS_sw_dict)
               insertIntoDataStruct('LONG',float(p_row[4]),CCS_sw_dict)
