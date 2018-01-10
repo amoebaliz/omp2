@@ -18,7 +18,7 @@ import matplotlib.dates as pltd
 def qwt2(wm_row,ict):
 
     # WATER MASS ID VALUES
-    wm = ('PSA', 'PSA', 'PEW', 'PEW', 'NPCW', 'NPCW')
+    wm = ('PSA', 'PSA', 'PSA', 'PEW', 'PEW', 'PEW', 'NPCW', 'NPCW', 'NPCW')
     
     # WATER TYPE MATRIX
     # lower PSA
@@ -32,12 +32,15 @@ def qwt2(wm_row,ict):
     #  Note: potential vorticity is multiplied by 10*8.
     wts=np.array(( \
     # PTEMP   SALT    OXY    PO4   NO3   SILICATE   mass   pvort
-    (  9.1,  33.50,  3.91,  1.56,  0.0,     20.30,   1.0,   0.0),\
-    (11.34,  33.58,  4.93,  1.14,  0.0,     11.25,   1.0,   0.0),\
-    ( 7.37,  34.04,  2.45,  2.32,  0.0,     43.42,   1.0,   0.0),\
-    ( 9.75,  33.85,  3.66,  1.68,  0.0,     23.65,   1.0,   0.0),\
-    ( 6.94,  34.06,  2.15,  2.43,  0.0,     49.97,   1.0,   0.0),\
-    ( 9.14,  33.97,  3.24,  1.80,  0.0,     26.16,   1.0,   0.0))) 
+    ( 8.87,  33.59,  3.58,  1.72,  0.0,     23.20,   1.0,   0.0),\
+    (11.91,  33.46,  5.44,  0.90,  0.0,      6.91,   1.0,   0.0),\
+    (10.39,  33.52,  4.51,  1.31,  0.0,     15.06,   1.0,   0.0),\
+    ( 7.66,  34.07,  0.70,  2.86,  0.0,     55.10,   1.0,   0.0),\
+    (10.26,  34.32,  2.39,  2.00,  0.0,     25.98,   1.0,   0.0),\
+    ( 8.96,  34.20,  1.55,  2.43,  0.0,     40.54,   1.0,   0.0),\
+    ( 6.25,  34.13,  1.21,  2.81,  0.0,     63.11,   1.0,   0.0),\
+    ( 9.37,  33.92,  3.66,  1.65,  0.0,     20.78,   1.0,   0.0),\
+    ( 7.81,  34.03,  2.44,  2.23,  0.0,     41.95,   1.0,   0.0))) 
 
     G1=np.transpose(wts[wm_row,:])
     allsize = wts.shape
@@ -93,9 +96,11 @@ print '  '
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP = 'cla' # classical OMP analysis
 # data location
-dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
-#dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
-#dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
+# dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+# dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
+# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
 # data limitations
 selection=  '(pdens>=23) & (pdens<=28)'# & (press>300) & (press<600)' 
 # Select/deselect potential vorticity by setting switchpot to 'y' or 'n':
@@ -112,7 +117,7 @@ weightset='testwght.npy'
 # number of water masses to be included in the analysis
 wm = 3
 #  Select the water type numbers (row in the water type matrix)
-qwt_pos = [0,2,4] # changed from [1,2,3,4]
+qwt_pos = [1,4,7] # changed from [1,2,3,4]
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -190,13 +195,13 @@ i = (0,1,2,3,5,6)
 G1 = G0[i,:]
 
 stations = [26.7,28,30,35,40,45,50,55,60,70,80,90,100,110,120] #LINE 93.3
-#stations = [51,55,60,70,80,90,100]                             #LINE 80.0
+stations = [51,55,60,70,80,90,100]                             #LINE 80.0
 #stations = [51,55,60,70,80,90]                                 #LINE 66.7
 nsta=len(stations)
 
 surf_frac = np.array([], dtype=np.int64).reshape(0,wm,nsta)
 cruise_dates = []
-for yr in range(1980,2014+1):
+for yr in range(1980,2017+1):
     Iy = np.where(np.array(mat_dat['YEAR'])==yr)
     if len(Iy[0])>30:
        mons = np.array(list(set(np.array(mat_dat['MONTH'])[Iy[0]])))
@@ -217,112 +222,12 @@ for yr in range(1980,2014+1):
            #dist,phaseangle = sw_dist(lat.squeeze(),lon.squeeze(),'km')
            cumdist=np.append(0, np.cumsum(dist))
            # This is the main part of it all: The call to omp2.m which does the analysis
-           #print omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,nsta,stats,lon,esx,\
-           #                               press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index).reshape(1,wm,nsta).shape
-           #print surf_frac.shape
            surf_frac = np.concatenate((surf_frac,\
                        omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stations,stats,lon,esx,\
                        press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index).reshape(1,wm,nsta)),axis=0) 
            cruise_dates = np.append(cruise_dates,pltd.date2num(dt.datetime(yr,mon,1)))
+
+# SAVE variables as file for plotting figures
 np.savez('water_mass_fractions_200m',surf_frac,cruise_dates)
-#ORIGINAL esx calculation method
-#eex = np.zeros(11) # index of available variables:
-#key_vars = ['LAT','LONG','press','SALINITY','PTEMP','OXYGEN','PHOSPHATE','ni','SILICATE','pvort','temp']
-#for n in range(len(key_vars)):
-#    if key_vars[n] in globals():
-#       eex[n]=1
-    #elif n == len(key_vars)-1:
-    #   temp = sw_temp(sal,ptemp,press,0)
-    #   eex[n]=1
 
-# Determine the number of variables used in this run:
-#esx=np.copy(eex) # index of selected variables
-#nvar = 3 + np.sum(var_switches)
 
-#for nt in range(len(var_switches)):
-#    esx[nt+5] = var_switches[nt]
-# Read the weight and Redfield ratio file
-# Check which weights are needed and reset the diagonal:
-#A    = np.diag(Wx)
-
-#A.setflags(write=1)
-#A1   = A[7]  # change order of weights so that mass conservation is last
-#A[7] = A[6]
-#A[6] = A1
-#ratio = ratio.squeeze()
-
-#if esx[4] == 0:
-#   A[0] = 0
-#   ratio[0] = -99999                    # no pot. temperature weight if not needed
-#if esx[3] == 0:
-#   A[1] = 0
-#   ratio[1] = -99999                    # no salinity weight if not needed
-#if esx[5] == 0:
-#   A[2] = 0
-#   ratio[2] = -99999                    # no oxygen weight if no oxygen
-#if esx[6] == 0:
-#   A[3] = 0
-#   ratio[3] = -99999                    # no phosphate weight if no phosphate
-#if esx[7] == 0:
-#   A[4] = 0
-#   ratio[4] = -99999                    # no nitrate weight if no nitrate
-#if esx[8] == 0:
-#   A[5] = 0
-#   ratio[5] = -99999                    # no silicate weight if no silicate
-#if esx[9] == 0:
-#   A[6] = 0
-#   ratio[6] = -99999                    # no pot. vorticity weight if not needed
-
-#statind = np.where(A>0)[0]
-#Wx = np.diag(A[statind])
-#statind = np.where(ratio>-99999)[0]
-#redfrat = ratio[statind]         # Redfield ratio for selected variables only
-#print '  '
-# End of if statements for weights and Redfield ratio
-
-# Read the water types
-#G0,wmnames,i = qwt2(qwt_pos,0)
-
-#wm_index = []
-#wm_ind0  = []
-#wm_ind1  = []
-#j = 0
-#print '  '
-#tit_index = []
-#for i in range(len(qwt_pos)):
-#    wm_ind1 = wmnames[qwt_pos[i]]
-#    k = (wm_ind0==wm_ind1)
-#    if not k:
-#       j = j+1
-#       tit_index.extend([wmnames[qwt_pos[i]]])
-#    wm_ind0 = wm_ind1
-#    wm_index.extend([j])
-
-#nr_of_wm = wm_index[len(wm_index)-1]
-
-#i = 2
-#del G1
-
-# G1 add rows
-#G1 = G0[:2,:] # PTEMP, SALT
-
-#if esx[5] == 1: # OXYGEN
-#   G1 = np.concatenate((G1,np.array([G0[2,:]])),axis=0)
-#   i = i+1
-#if esx[6] == 1: # PHOSPHATE
-#   G1 = np.concatenate((G1,np.array([G0[3,:]])),axis=0)   
-#   i = i+1
-#if esx[7] ==1:  # NITRATE
-#   G1 = np.concatenate((G1,np.array([G0[4,:]])),axis=0)
-#   i = i+1
-#if esx[8] == 1: # SILICATE
-#   G1 = np.concatenate((G1,np.array([G0[5,:]])),axis=0)
-#   i = i+1
-#if esx[9] == 1: # MASS
-#   G1 = np.concatenate((G1,np.array([G0[7,:]])),axis=0) # Concatenate pvort  
-#   i = i+1
-#G1 =  np.concatenate((G1,np.array([G0[6,:]])),axis=0) # Concatenate mass
-# This is the main part of it all: The call to omp2.m which does the analysis
-#omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,esx,press,sal,oxy,ptemp,temp,pdens,ph,ni,G1,wm_index)
-#omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index)
-# It's all done. Documentation and display is all in omp2.m.
