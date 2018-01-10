@@ -18,7 +18,7 @@ def wm_prop(para, stations, stats, lat, lon, press):
     para1=para[~np.isnan(para)]
 
     # DEPTH RANGES: above 75 for surface; 100m-200m for sub-surface
-    slim = 200.
+    slim = 400.
     mld1 = 100.
     mld2 = 200.
 

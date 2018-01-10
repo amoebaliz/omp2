@@ -96,8 +96,12 @@ print '  '
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP = 'cla' # classical OMP analysis
 # data location
-dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
-dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
+# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
+# dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+# dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
+# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+=======
 # dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
 # dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
 # dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
@@ -194,9 +198,8 @@ nr_of_wm = wm_index[len(wm_index)-1]
 i = (0,1,2,3,5,6)
 G1 = G0[i,:]
 
-stations = [26.7,28,30,35,40,45,50,55,60,70,80,90,100,110,120] #LINE 93.3
-stations = [51,55,60,70,80,90,100]                             #LINE 80.0
-#stations = [51,55,60,70,80,90]                                 #LINE 66.7
+# stations = [26.7,28,30,35,40,45,50,55,60,70,80,90,100,110,120] #LINE 93.3
+# stations = [51,55,60,70,80,90,100]                             #LINE 80.0
 nsta=len(stations)
 
 surf_frac = np.array([], dtype=np.int64).reshape(0,wm,nsta)
