@@ -18,7 +18,7 @@ import matplotlib.dates as pltd
 def qwt2(wm_row,ict):
 
     # WATER MASS ID VALUES
-    wm = ('PSA', 'PSA', 'PSA', 'PEW', 'PEW', 'PEW', 'NPCW', 'NPCW', 'NPCW')
+    wm = ('PSA', 'PSA', 'PEW', 'PEW', 'NPCW', 'NPCW')
     
     # WATER TYPE MATRIX
     # lower PSA
@@ -34,13 +34,10 @@ def qwt2(wm_row,ict):
     # PTEMP   SALT    OXY    PO4   NO3   SILICATE   mass   pvort
     ( 8.87,  33.59,  3.58,  1.72,  0.0,     23.20,   1.0,   0.0),\
     (11.91,  33.46,  5.44,  0.90,  0.0,      6.91,   1.0,   0.0),\
-    (10.39,  33.52,  4.51,  1.31,  0.0,     15.06,   1.0,   0.0),\
-    ( 7.66,  34.07,  0.70,  2.86,  0.0,     55.10,   1.0,   0.0),\
-    (10.26,  34.32,  2.39,  2.00,  0.0,     25.98,   1.0,   0.0),\
-    ( 8.96,  34.20,  1.55,  2.43,  0.0,     40.54,   1.0,   0.0),\
+    ( 7.66,  34.32,  0.70,  2.86,  0.0,     55.10,   1.0,   0.0),\
+    (10.26,  34.07,  2.39,  2.00,  0.0,     25.98,   1.0,   0.0),\
     ( 6.25,  34.13,  1.21,  2.81,  0.0,     63.11,   1.0,   0.0),\
-    ( 9.37,  33.92,  3.66,  1.65,  0.0,     20.78,   1.0,   0.0),\
-    ( 7.81,  34.03,  2.44,  2.23,  0.0,     41.95,   1.0,   0.0))) 
+    ( 9.37,  33.92,  3.66,  1.65,  0.0,     20.78,   1.0,   0.0)))
 
     G1=np.transpose(wts[wm_row,:])
     allsize = wts.shape
@@ -95,37 +92,32 @@ print '  '
 #   Originally from  incontr2:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP = 'cla' # classical OMP analysis
+
 # data location
-# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
-# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
+# MACBOOK FILES:
+dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
+# SWFSC FILES:
 # dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
 # dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
-# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
-=======
-# dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
-# dataset = '/Users/liz.drenkard/TOOLS/omp2/scripts/CalCOFI_LINE_080.0.npy'
-# dataset = '/Users/elizabethdrenkard/TOOLS/omp2/scripts/CalCOFI_LINE_093.3.npy'
+
 # data limitations
 selection=  '(pdens>=23) & (pdens<=28)'# & (press>300) & (press<600)' 
+
 # Select/deselect potential vorticity by setting switchpot to 'y' or 'n':
 switchpot = 'n'
-# Select/deselect variables by setting corresponding switches to 'y' or 'n':
-iox = 1 #'y' # oxygen switch
-iph = 1 #'y' # phosphate switch
-ini = 0 #'n' # nitrate switch
-isi = 1 #'y' # silicate switch
-var_switches = [1,1,0,1]
-# file which contains the weights 
-# weightset='/Users/elizabethdrenkard/TOOLS/omp2mats/testwght.mat'
+
+# WEIGHTS FOR VARIABLES
 weightset='testwght.npy'
+
 # number of water masses to be included in the analysis
 wm = 3
-#  Select the water type numbers (row in the water type matrix)
-qwt_pos = [1,4,7] # changed from [1,2,3,4]
 
+#  Select the water type numbers (row in the water type matrix)
+qwt_pos = [0,1,2,3,5] 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Loading .mat files into python - soon to be netCDF
+# Loading .npy files into python 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 mat_dat=np.load(dataset).item()
 globals().update(mat_dat)
@@ -153,10 +145,11 @@ globals().update(weight_dat)
 # The arrangement of the water type matrix and the weight vector thus differs from the description
 # in the user manual. This should not be of concern but has to be watched when changing the code.
 
+# ORIGINAL
 esx = np.array((1,1,1,1,1,1,1,0,1,0,0)) 
-
 # Read the weight and Redfield ratio file
 # Check which weights are needed and reset the diagonal:
+print Wx.shape
 A    = np.diag(Wx)
 A.setflags(write=1)
 A1   = A[7]  # change order of weights so that mass conservation is last
@@ -198,8 +191,9 @@ nr_of_wm = wm_index[len(wm_index)-1]
 i = (0,1,2,3,5,6)
 G1 = G0[i,:]
 
-# stations = [26.7,28,30,35,40,45,50,55,60,70,80,90,100,110,120] #LINE 93.3
-# stations = [51,55,60,70,80,90,100]                             #LINE 80.0
+# SELECT STATIONS 
+stations = [26.7,28,30,35,40,45,50,55,60,70,80,90,100,110,120] #LINE 93.3
+stations = [51,55,60,70,80,90,100]                             #LINE 80.0
 nsta=len(stations)
 
 surf_frac = np.array([], dtype=np.int64).reshape(0,wm,nsta)
@@ -222,11 +216,9 @@ for yr in range(1980,2017+1):
            si = np.array(mat_dat['SILICATE'])[I[0]]
            press = np.array(mat_dat['PRESS'])[I[0]]
            dist = sw_dist(lat.squeeze(),lon.squeeze(),'km')
-           #dist,phaseangle = sw_dist(lat.squeeze(),lon.squeeze(),'km')
-           cumdist=np.append(0, np.cumsum(dist))
            # This is the main part of it all: The call to omp2.m which does the analysis
            surf_frac = np.concatenate((surf_frac,\
-                       omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stations,stats,lon,esx,\
+                       omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stations,stats,yr,mon,lon,esx,\
                        press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index).reshape(1,wm,nsta)),axis=0) 
            cruise_dates = np.append(cruise_dates,pltd.date2num(dt.datetime(yr,mon,1)))
 

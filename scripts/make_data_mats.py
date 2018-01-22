@@ -34,7 +34,7 @@ def insertIntoDataStruct(name,val,aDict):
 def dic_from_csv(rd_fil):
     # EXTRACT DATA FOR SPECIFIC STATIONS AND MONTHS 
     for row in rd_fil:
-        # IF CORRECT STATION
+        # IF CORRECT LINE (ALL STATIONS)
         if (row[2][:5] == str(line_num).zfill(5) and \
            (len(row[51])>0) and \
            (len(row[52])>0) and \

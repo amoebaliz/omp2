@@ -27,13 +27,13 @@
 #   or  matthias.tomczak@flinders.edu.au
 
 # 
-def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stations,stats,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index):    
-    from norm_qwt import norm_qwt
+def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stations,stats,yr,mon,lon,esx,press,sal,oxy,ptemp,pdens,ph,si,G1,wm_index):    
+
     import scipy
     import numpy as np
     import matplotlib.pyplot as plt
-    from contour2 import contour2
     from wm_prop import wm_prop
+
     print '  '
     print 'OMP analysis now running. ', str(len(lat)) + ' data points found.'
     print '  '
@@ -54,11 +54,6 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stati
     press = press[index]
     lon   = lon[index]
     sal   = sal[index]
-
-    #lat   =  np.transpose(lat[index])
-    #press =  np.transpose(press[index])
-    #long  =  np.transpose(long[index])
-    #sal   =  np.transpose(sal[index])
       
     if 'temp' in locals():
        temp = temp[index]
@@ -86,27 +81,31 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stati
     print '  '
 
     m,n = G1.shape[:] # n = number of water types, m = number of equations
-
-    # normalise the source water matrix (get meanG, get stdG for weighting):
-    G, mG, stdG = norm_qwt(G1)
+    print 'number of water types: ', n, 'number of equations: ', m
+    # NORMALIZE source water matrix (get meanG, get stdG for weighting):
+    # originally called norm_qwt
+    # G, mG, stdG = norm_qwt(G1)
+    mG   = np.mean(G1,axis=1) 
+    stdG = np.std(G1,axis=1)
+    G    = np.ones(G1.shape)
+    G[:-1,:] = (G1[:-1,:]-np.tile(mG.reshape(-1,1),n)[:-1,:])/np.tile(stdG.reshape(-1,1),n)[:-1,:]
 
     # EXTENDED OMP switch:
     # switch(OMP)
-    if OMP == 'ext':
+    #if OMP == 'ext':
          # Adding Redfield ratio to the system, ratio comes from weight file
-         G1[:m,n]=np.transpose(redfrat[:m])
+    #     G1[:m,n]=np.transpose(redfrat[:m])
 	 # normalisation of the ratios:
 	 # ---------------------------------
- 	 for rr in range(m-1):
-  	     G[rr,n] = redfrat[rr]*(max(G[rr,:n])-min(G[rr,:n])) \
-           /(max(G1[rr,:n])-min(G1[rr,:n]))
-	 G[m,n] = 0
+    #	 for rr in range(m-1):
+    # 	     G[rr,n] = redfrat[rr]*(max(G[rr,:n])-min(G[rr,:n])) \
+    #       /(max(G1[rr,:n])-min(G1[rr,:n]))
+    #	 G[m,n] = 0
 
     # adding weights
     G2=np.dot(Wx,G)
-
     gap=0
-    # PYTH
+
     # ***********************************************************
     # This is the main loop for each data point; k = point index
     # First some initial settings
@@ -115,6 +114,7 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stati
        biogeo=np.zeros[1,len(lat)]-nan 
     A = np.zeros((wm_index[len(wm_index)-1],len(lat)))
     # Vector of each datapoint (btst) is build here
+    # Vector contains all parameters for given measurement
     for k in range(len(lat)):
 	# selecting the correct parameters
         btst = np.append(ptemp[k],sal[k])
@@ -155,16 +155,16 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stati
            stdG1 = stdG[index1]
  
         # standardize the data:
-        b = np.zeros(len(b1))
-        for i in range(len(b1)-1):
-            b[i]=(b1[i]-mG1[i])/stdG1[i]
-        b[len(b1)-1]=b1[len(b1)-1]
+        b = np.ones(len(b1))
+        # omitting mass conservation for standardization
+        b[:-1] = (b1[:-1] - mG1[:-1])/stdG1[:-1] 
 
-        # add weights:  
+        # add weights:
         b2=Wx[index1,index1]*b
 
         ## use either nnls.m or lsqnonneg.m depending on MatLab version
         x, rnorm = scipy.optimize.nnls(G2[index1,:],b2)
+        # print 'X THAT POPULATES A:',np.sum(x)
         # calculate residuals for individual parameters
         err[index1,k] = np.dot(G1[index1,:],x) - np.transpose(btst[index1]) 
         #add contributions from identically named water masses
@@ -176,10 +176,10 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stati
         # NOTE: this has to be referenced with the appropriate ratio to
         # convert into "mixage"
         # default is changes in oxygen UNIT= ?mol/kg!!! and NOT years!!!
-        if OMP == 'ext':
-           biogeo[k]=x[len(x)-1]*(-ratio[3])
-        del b
-        #end of loop with enough data
+        # if OMP == 'ext':
+        #   biogeo[k]=x[len(x)-1]*(-ratio[3])
+        # del b
+        # end of loop with enough data
 
        ## end of data point loop
     #summary of run:
@@ -229,13 +229,20 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stati
 
     # PLOTTING RESIDUALS
 #    fig, ax = plt.subplots()
-#    ax.plot(100*err[m-1,:],pdens,'o')
+#    MONSTR = ['January', 'February', 'March', 'April', 'May', 'June','July','August','September','October','November','December']
+#    tit_str = MONSTR[mon-1] + ' ' + str(yr) 
+#    plt.title(tit_str)
+    #ax.plot(100*err[m-1,:],pdens,'o')
+#    ax.plot(100*err[m-1,:],press,'o')
     #ax.set_ylim([22,28])
     #ax.set_xlim([-50,150])
 #    ax.invert_yaxis()
 #    ax.set_xlabel('mass conservation residual of fit (%)')
-#    ax.set_ylabel('density')
-#    print '  '
+#    ax.set_ylabel('pressure (dbar)')
+    print '# GOOD POINTS = ', len(np.where(100*err[m-1,:]<10)[0]), ' OUT OF ', len(press)
+    #ax.set_ylabel('density')
+#    plt.show()
+    print '  '
 #    j = 'n'
 #    incontrol = input('Do you want to see more graphic output (y/n)?  [n]  ')
 #    print A.shape
@@ -281,12 +288,6 @@ def omp2(OMP,nr_of_wm,tit_index,qwt_pos,wmnames,Wx,lat,switchpot,selection,stati
     #if esx[8]  == 1: vname = vname + ' si'
     #if esx[9] == 1: vname = vname + ' pvort'
 		
-    # SAVE SOMETHING 
-    #eval('save %s vname')
-    #print '  '
-    #print 'File ', incontrol, ' created and saved as: ',  vname[:lv], '.mat'
-    #print ' in:  ', pwd
-
     print '  '
     print 'E N D   O F   O M P   A N A L Y S I S'
     return sur_frac

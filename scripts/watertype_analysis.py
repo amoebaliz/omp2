@@ -137,7 +137,8 @@ CCS_sw_dict = {}
 CCS_sw_iso_dict = {}
 
 # OPEN/READ CalCOFI DATA FILES
-if wt ==1 :
+if wt > 4 :
+   # USING ENSO 97-99
    fid = nc.Dataset(nc_fil) 
    dic_from_nc(fid)   
 else:
@@ -156,7 +157,8 @@ npt = len(PTEMP)
 
 print 'PTEMP MIN', np.min(PTEMP)
 print 'PTEMP MAX', np.max(PTEMP)
-print 'PTEMP MEAN', np.mean(PTEMP)
+#print 'PTEMP MEAN', np.mean(PTEMP)
+print 'PTEMP VARIANCE', np.var(PTEMP)
 f3, ax3 = plt.subplots(2, 4,figsize=(12,5),sharey='row')
 
 # ITERATE OVER ALL VARS
@@ -205,9 +207,11 @@ for nv in range(4):
 
     print '-------------------'
     print sw_vars[nv+1], 'ERROR = ', np.sum((np.polyval(np.polyfit(PTEMP, VAR, 1), PTEMP) - VAR)**2)
-    print sw_vars[nv+1], 'MIN = ', np.min(np.polyval(coeff,PTEMP)) 
-    print sw_vars[nv+1], 'MAX = ', np.max(np.polyval(coeff,PTEMP)) 
-    print sw_vars[nv+1], 'MEAN = ', np.mean(VAR)
+    #print sw_vars[nv+1], 'MIN = ', np.min(np.polyval(coeff,PTEMP)) 
+    #print sw_vars[nv+1], 'MAX = ', np.max(np.polyval(coeff,PTEMP)) 
+    #print sw_vars[nv+1], 'MEAN = ', np.mean(VAR)
+    print sw_vars[nv+1], 'VARIANCE = ', np.var(VAR)
+    print sw_vars[nv+1], 'RESID VARIANCE = ', np.mean(r**2)
 print err
 
 # FIGURE DETAILS
@@ -233,4 +237,3 @@ fig_tit = wt_abs[wt] + '_regression.png'
 plt.savefig(fig_tit)
 
 plt.show()
-
