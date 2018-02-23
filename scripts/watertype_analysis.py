@@ -93,7 +93,7 @@ def dic_from_nc(fid):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # SELECT STATION FOR SPECIFIC WATER TYPE
-wt = 2
+wt = 0
 
 # SELECT DENSITY RANGE
 pkt = .3  # Buffer for potential density (isopycnal) values 
